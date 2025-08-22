@@ -1,75 +1,45 @@
-# Low-Cost-Driver-Monitoring-System-Using-Machine-Learning
-
-import cv2
-import winsound
-import os
-from datetime import datetime
-
-# Create folder to save captured images
-save_dir = "captured_alerts"
-os.makedirs(save_dir, exist_ok=True)
-
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
-
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-cap.set(3, 640)
-cap.set(4, 480)
-
-eye_closed_frames = 0
-EYE_CLOSED_THRESHOLD = 15
-ALERT_ON = False
-
-try:
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, 1.2, 5)
-
-        if len(faces) > 0:
-            eyes_detected = False
-            for (x, y, w, h) in faces:
-                roi_gray = gray[y:y+h, x:x+w]
-                roi_color = frame[y:y+h, x:x+w]
-
-                eyes = eye_cascade.detectMultiScale(roi_gray, 1.1, 3, minSize=(30, 30))
-                if len(eyes) > 0:
-                    eyes_detected = True
-                    for (ex, ey, ew, eh) in eyes:
-                        cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0,255,0), 2)
-
-            if eyes_detected:
-                if eye_closed_frames > 0:
-                    eye_closed_frames -= 1
-            else:
-                eye_closed_frames += 1
-                print(f"Eyes possibly closed - frame count: {eye_closed_frames}")
-
-            if eye_closed_frames >= EYE_CLOSED_THRESHOLD:
-                if not ALERT_ON:
-                    print("⚠️ ALERT: Driver might be sleeping!")
-                    winsound.Beep(1000, 1000)  # 1 sec beep
-                    ALERT_ON = True
-
-                    # ---- SAVE PHOTO ----
-                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    filename = os.path.join(save_dir, f"alert_{timestamp}.jpg")
-                    cv2.imwrite(filename, frame)
-                    print(f"📷 Photo captured: {filename}")
-
-            else:
-                ALERT_ON = False
-
-        cv2.imshow("Drowsiness Detection", frame)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-except KeyboardInterrupt:
-    print("Program interrupted manually!")
-
-cap.release()
-cv2.destroyAllWindows()
+----------------------------------------------------------------------------------------------------------------------------
+A Driver Monitoring System (DMS) is an in-vehicle safety technology that uses cameras and sensors
+to track the driver's eye movements, head position, and behavior. It detects signs of drowsiness,
+distraction, or inattention and alerts the driver to stay focused, enhancing overall road safety and accident
+prevention.
+A Driver Monitoring System is needed to enhance road safety by reducing accidents caused by
+driver fatigue, distraction, or inattention—common factors in traffic crashes. It helps ensure drivers stay
+alert, especially during long trips or in semi-autonomous vehicles. By providing timely alerts or taking
+corrective actions, DMS can prevent dangerous situations, protect passengers and pedestrians, and
+support compliance with growing vehicle safety regulations worldwide.
+Low-cost Driver Monitoring Systems are important to make advanced safety features accessible in
+a wider range of vehicles, including budget models. This increases overall road safety by enabling more
+drivers to benefit from the technology, supporting broader adoption, regulatory compliance, and reducing
+traffic accidents across all income levels.
+IoT (Internet of Things) is needed to enable seamless connectivity and communication between
+devices, allowing real-time data collection, monitoring, and control. In transportation, IoT enhances
+vehicle safety, efficiency, and maintenance by linking systems like Driver Monitoring, GPS, and diagnostics.
+It supports smarter decision-making, remote access, and predictive analytics, leading to improved
+performance, reduced downtime, and a better driving experience. IoT also plays a key role in smart city
+and mobility solutions.
+Machine Learning (ML) can be used to improve accuracy and adaptability in systems like Driver
+Monitoring by learning patterns from vast data. It enables real-time detection of drowsiness, distraction,
+or risky behavior with high precision. ML models continuously evolve, enhancing performance over time.
+In broader IoT applications, ML supports predictive maintenance, anomaly detection, and intelligent
+decision-making, making systems smarter, more efficient, and responsive to changing environments and
+user behavior.
+ The paper titled “Low-Cost Driver Monitoring System Using Deep Learning” proposes an affordable
+and efficient driver drowsiness detection system using deep learning and IoT hardware. The main objective
+is to identify signs of fatigue in drivers—specifically yawning and eye closure—in real time using a
+Raspberry Pi-based setup.[3]
+Two datasets were used in the study. For yawning detection, a custom dataset was created using
+videos of 15 volunteers. Around 500 images were manually labeled and later expanded to 1,020 images
+through data augmentation. For eye state detection, the authors used the Kaggle Eye State Dataset, which
+includes 1,500 images, later augmented to 3,000 images.[2]
+The models were based on a modified LeNet-5 convolutional neural network, chosen for its
+simplicity and efficiency on low-power devices. The system was implemented on a Raspberry Pi 3 Model
+B+, with a Pi Camera Module V2 for image capture and a buzzer/display module for alerting the driver.The
+models achieved 96% accuracy for yawning detection and 97.5% for eye state classification, performing
+reliably in real-time.[1]
+ The existing method relies on limited features—eye state and yawning—for drowsiness detection,
+which may miss other indicators like gaze direction or head tilting. The small dataset and single-camera
+setup reduce accuracy under varied conditions. To improve the system, we can use larger, more diverse
+datasets, integrate additional sensors like infrared or gyroscope and adopt lightweight, more robust deep
+learning models for better real-time performance.
+-------------------------------------------------------------------------------------------------------------------------------------
